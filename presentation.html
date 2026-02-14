@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Quiz Agent - Faculty Presentation</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, sans-serif; background: #0f172a; color: #e2e8f0; overflow: hidden; }
+  .deck { width: 100vw; height: 100vh; position: relative; }
+  .slide { width: 100vw; height: 100vh; display: none; flex-direction: column; justify-content: center; padding: 80px 120px; position: absolute; inset: 0; }
+  .slide.active { display: flex; }
+  .slide-number { position: fixed; bottom: 24px; right: 40px; font-size: 13px; color: #64748b; z-index: 10; }
+  .progress { position: fixed; top: 0; left: 0; height: 3px; background: #6366f1; transition: width 0.3s; z-index: 10; }
+  .nav-hint { position: fixed; bottom: 24px; left: 40px; font-size: 12px; color: #475569; z-index: 10; }
+
+  /* Title slide */
+  .slide-title { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); }
+  .slide-title h1 { font-size: 56px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 16px; }
+  .slide-title h1 span { background: linear-gradient(135deg, #818cf8, #a78bfa, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .slide-title .subtitle { font-size: 22px; color: #94a3b8; font-weight: 400; margin-bottom: 40px; }
+  .slide-title .author { font-size: 16px; color: #6366f1; font-weight: 500; }
+  .slide-title .date { font-size: 14px; color: #475569; margin-top: 8px; }
+
+  /* Content slides */
+  .slide h2 { font-size: 36px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 32px; }
+  .slide h2 span { color: #818cf8; }
+  .slide h3 { font-size: 20px; font-weight: 600; margin-bottom: 16px; color: #a5b4fc; }
+  .slide p { font-size: 18px; line-height: 1.7; color: #cbd5e1; max-width: 900px; }
+  .slide ul { list-style: none; font-size: 18px; line-height: 2; }
+  .slide ul li::before { content: "->"; color: #6366f1; font-weight: 700; margin-right: 12px; }
+  .slide .highlight { color: #a5b4fc; font-weight: 600; }
+
+  /* Grid layouts */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; }
+  .feature-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 24px; }
+  .feature-card .icon { font-size: 28px; margin-bottom: 12px; }
+  .feature-card h4 { font-size: 16px; font-weight: 600; margin-bottom: 8px; color: #e2e8f0; }
+  .feature-card p { font-size: 14px; color: #94a3b8; line-height: 1.6; }
+
+  /* Stat cards */
+  .stat-card { text-align: center; background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.15); border-radius: 12px; padding: 28px 20px; }
+  .stat-card .stat-num { font-size: 42px; font-weight: 800; color: #818cf8; letter-spacing: -0.02em; }
+  .stat-card .stat-desc { font-size: 14px; color: #94a3b8; margin-top: 6px; }
+
+  /* Table */
+  .slide table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  .slide th { text-align: left; padding: 10px 16px; color: #94a3b8; font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .slide td { padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); color: #cbd5e1; }
+  .slide td:first-child { font-weight: 500; color: #e2e8f0; }
+  .check { color: #34d399; }
+  .cross { color: #64748b; }
+
+  /* Tech stack */
+  .tech-pill { display: inline-block; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px 16px; font-size: 14px; font-weight: 500; margin: 4px; color: #cbd5e1; }
+
+  /* Roles */
+  .role-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 28px; }
+  .role-card .role-name { font-size: 18px; font-weight: 700; color: #818cf8; margin-bottom: 12px; }
+  .role-card ul { font-size: 14px; line-height: 1.9; }
+  .role-card ul li::before { content: "->"; color: #4f46e5; font-weight: 600; margin-right: 8px; }
+
+  /* Section divider */
+  .slide-section { justify-content: center; align-items: center; text-align: center; }
+  .slide-section h2 { font-size: 48px; margin-bottom: 12px; }
+  .slide-section p { font-size: 20px; color: #64748b; text-align: center; }
+
+  /* End slide */
+  .slide-end { justify-content: center; align-items: center; text-align: center; background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); }
+  .slide-end h2 { font-size: 48px; margin-bottom: 16px; }
+  .slide-end p { text-align: center; }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+  <div class="progress" id="progress"></div>
+  <div class="nav-hint">Use arrow keys or click to navigate</div>
+
+  <!-- Slide 1: Title -->
+  <div class="slide slide-title active">
+    <h1><span>Smart Quiz Agent</span></h1>
+    <div class="subtitle">AI-Powered Quiz Management Platform for Education</div>
+    <div class="author">Aryan Kale</div>
+    <div class="date">February 2026</div>
+  </div>
+
+  <!-- Slide 2: Problem -->
+  <div class="slide">
+    <h2>The <span>Problem</span></h2>
+    <div class="grid-2" style="align-items:start">
+      <ul>
+        <li>Manual question creation is <span class="highlight">time-consuming</span></li>
+        <li>Static assessments lack <span class="highlight">engagement</span></li>
+        <li>No AI evaluation for <span class="highlight">subjective answers</span></li>
+        <li>Limited analytics for identifying <span class="highlight">student struggles</span></li>
+        <li>Low motivation without <span class="highlight">gamification</span></li>
+      </ul>
+      <div class="grid-2" style="gap:16px">
+        <div class="stat-card"><div class="stat-num">70%</div><div class="stat-desc">Teacher time on manual quiz creation</div></div>
+        <div class="stat-card"><div class="stat-num">34%</div><div class="stat-desc">Engagement gap without gamification</div></div>
+        <div class="stat-card"><div class="stat-num">50%</div><div class="stat-desc">Drop in completion without incentives</div></div>
+        <div class="stat-card"><div class="stat-num">0</div><div class="stat-desc">AI evaluation in traditional tools</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 3: Solution Overview -->
+  <div class="slide">
+    <h2>Our <span>Solution</span></h2>
+    <p style="margin-bottom:32px">A comprehensive platform that combines AI intelligence with engaging quiz experiences.</p>
+    <div class="grid-3">
+      <div class="feature-card"><div class="icon">&#129302;</div><h4>AI Quiz Generation</h4><p>Auto-generate questions from uploaded PDFs and topic descriptions using Claude AI</p></div>
+      <div class="feature-card"><div class="icon">&#9889;</div><h4>Live Quiz Mode</h4><p>Kahoot-style real-time sessions with join codes, timers, and live leaderboards</p></div>
+      <div class="feature-card"><div class="icon">&#127942;</div><h4>Gamification</h4><p>XP, levels, badges, streaks, and leaderboards to drive student engagement</p></div>
+      <div class="feature-card"><div class="icon">&#128202;</div><h4>Smart Analytics</h4><p>Per-question analytics, heatmaps, struggling student alerts, and CSV export</p></div>
+      <div class="feature-card"><div class="icon">&#128218;</div><h4>6 Question Types</h4><p>MCQ, True/False, Short Answer, Fill-in-Blank, Matching, and Ordering</p></div>
+      <div class="feature-card"><div class="icon">&#128172;</div><h4>AI Tutor</h4><p>Conversational AI assistant for personalized student help and guidance</p></div>
+    </div>
+  </div>
+
+  <!-- Slide 4: Architecture -->
+  <div class="slide">
+    <h2>Tech <span>Architecture</span></h2>
+    <div class="grid-2" style="align-items:start">
+      <div>
+        <h3>Stack</h3>
+        <div style="margin-bottom:24px">
+          <div class="tech-pill">Express.js 5</div>
+          <div class="tech-pill">TypeScript</div>
+          <div class="tech-pill">PostgreSQL</div>
+          <div class="tech-pill">Drizzle ORM</div>
+          <div class="tech-pill">Claude AI (Anthropic)</div>
+          <div class="tech-pill">MCP Tools</div>
+          <div class="tech-pill">JWT Auth</div>
+          <div class="tech-pill">SSE (Real-time)</div>
+          <div class="tech-pill">pdf-parse</div>
+          <div class="tech-pill">Zod</div>
+        </div>
+        <h3>Scale</h3>
+        <ul style="font-size:15px">
+          <li>13 database tables</li>
+          <li>45+ REST API endpoints</li>
+          <li>4 custom AI MCP tools</li>
+          <li>3 user roles with RBAC</li>
+        </ul>
+      </div>
+      <div>
+        <h3>AI MCP Tools</h3>
+        <div class="feature-card" style="margin-bottom:12px"><h4>generate_quiz</h4><p>Creates questions from materials with configurable type, difficulty, and count</p></div>
+        <div class="feature-card" style="margin-bottom:12px"><h4>evaluate_answers</h4><p>Auto-grades with semantic understanding and partial credit</p></div>
+        <div class="feature-card" style="margin-bottom:12px"><h4>get_performance_analytics</h4><p>Analyzes student, quiz, and organization performance</p></div>
+        <div class="feature-card"><h4>get_topic_insights</h4><p>Topic-level mastery and difficulty analysis</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 5: AI Features -->
+  <div class="slide">
+    <h2>AI-Powered <span>Intelligence</span></h2>
+    <div class="grid-2" style="gap:40px;align-items:start">
+      <div>
+        <h3>Quiz Generation</h3>
+        <ul style="font-size:15px;margin-bottom:28px">
+          <li>Upload PDF study materials</li>
+          <li>AI extracts content and generates relevant questions</li>
+          <li>Configurable: question type, difficulty, count</li>
+          <li>Automatic explanations for each answer</li>
+          <li>Grade-level appropriate content</li>
+        </ul>
+        <h3>Answer Evaluation</h3>
+        <ul style="font-size:15px">
+          <li>Semantic understanding of short answers</li>
+          <li>Partial credit based on conceptual accuracy</li>
+          <li>Constructive feedback on incorrect responses</li>
+          <li>Auto-grading for all 6 question types</li>
+        </ul>
+      </div>
+      <div>
+        <h3>AI Tutor Chat</h3>
+        <ul style="font-size:15px;margin-bottom:28px">
+          <li>Conversational assistant for students</li>
+          <li>Context-aware help based on quiz topics</li>
+          <li>Explains concepts, not just answers</li>
+          <li>Persistent chat history per conversation</li>
+        </ul>
+        <h3>Analytics Intelligence</h3>
+        <ul style="font-size:15px">
+          <li>Performance trend analysis (improving/declining)</li>
+          <li>Weak subject identification</li>
+          <li>Topic mastery insights</li>
+          <li>Common mistake pattern detection</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 6: Gamification -->
+  <div class="slide">
+    <h2><span>Gamification</span> Engine</h2>
+    <div class="grid-2" style="gap:40px;align-items:start">
+      <div>
+        <h3>XP & Leveling</h3>
+        <div class="feature-card" style="margin-bottom:16px">
+          <table style="width:100%">
+            <tr><td>Quiz completion</td><td style="text-align:right;color:#818cf8;font-weight:600">+50 XP</td></tr>
+            <tr><td>Per correct answer</td><td style="text-align:right;color:#818cf8;font-weight:600">+10 XP</td></tr>
+            <tr><td>Perfect score bonus</td><td style="text-align:right;color:#818cf8;font-weight:600">+100 XP</td></tr>
+            <tr><td>Speed bonus</td><td style="text-align:right;color:#818cf8;font-weight:600">+30 XP</td></tr>
+            <tr><td>Daily streak bonus</td><td style="text-align:right;color:#818cf8;font-weight:600">+25 XP</td></tr>
+            <tr><td style="border:none">First attempt bonus</td><td style="text-align:right;color:#818cf8;font-weight:600;border:none">+20 XP</td></tr>
+          </table>
+        </div>
+        <p style="font-size:14px;color:#94a3b8">Level formula: <code style="color:#a5b4fc">floor(sqrt(xp / 100)) + 1</code></p>
+      </div>
+      <div>
+        <h3>8 Badges</h3>
+        <div class="grid-2" style="gap:10px">
+          <div class="feature-card" style="padding:14px"><span style="font-size:20px">&#127947;</span> <span style="font-size:13px;font-weight:500">First Steps</span></div>
+          <div class="feature-card" style="padding:14px"><span style="font-size:20px">&#128293;</span> <span style="font-size:13px;font-weight:500">On Fire (3-day)</span></div>
+          <div class="feature-card" style="padding:14px"><span style="font-size:20px">&#9889;</span> <span style="font-size:13px;font-weight:500">Week Warrior</span></div>
+          <div class="feature-card" style="padding:14px"><span style="font-size:20px">&#11088;</span> <span style="font-size:13px;font-weight:500">Perfect Score</span></div>
+          <div class="feature-card" style="padding:14px"><span style="font-size:20px">&#127942;</span> <span style="font-size:13px;font-weight:500">Quiz Master</span></div>
+          <div class="feature-card" style="padding:14px"><span style="font-size:20px">&#128218;</span> <span style="font-size:13px;font-weight:500">Subject Expert</span></div>
+          <div class="feature-card" style="padding:14px"><span style="font-size:20px">&#9201;</span> <span style="font-size:13px;font-weight:500">Speed Demon</span></div>
+          <div class="feature-card" style="padding:14px"><span style="font-size:20px">&#128170;</span> <span style="font-size:13px;font-weight:500">Comeback Kid</span></div>
+        </div>
+        <div style="margin-top:16px">
+          <h3>Also includes</h3>
+          <ul style="font-size:14px">
+            <li>Weekly, monthly, all-time leaderboards</li>
+            <li>Daily challenge with bonus XP</li>
+            <li>Streak tracking (current + longest)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 7: User Roles -->
+  <div class="slide">
+    <h2>User <span>Roles</span></h2>
+    <div class="grid-3" style="gap:24px">
+      <div class="role-card">
+        <div class="role-name">Admin</div>
+        <ul>
+          <li>Manage organizations</li>
+          <li>Assign teachers to schools</li>
+          <li>Enroll students</li>
+          <li>Platform-wide analytics</li>
+          <li>All teacher capabilities</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <div class="role-name">Teacher</div>
+        <ul>
+          <li>Create topics and upload PDFs</li>
+          <li>AI-generate or manually create quizzes</li>
+          <li>Run live quiz sessions</li>
+          <li>View student analytics</li>
+          <li>Per-question difficulty analysis</li>
+          <li>Identify struggling students</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <div class="role-name">Student</div>
+        <ul>
+          <li>Take quizzes with instant feedback</li>
+          <li>Earn XP, badges, and levels</li>
+          <li>Join live quiz sessions</li>
+          <li>Chat with AI tutor</li>
+          <li>Track performance by subject</li>
+          <li>Daily challenges and streaks</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 8: Competitive Edge -->
+  <div class="slide">
+    <h2>Competitive <span>Comparison</span></h2>
+    <table>
+      <thead>
+        <tr><th>Feature</th><th>Smart Quiz Agent</th><th>Kahoot</th><th>Quizizz</th><th>Google Forms</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>AI Quiz Generation</td><td class="check">Yes</td><td class="cross">No</td><td class="cross">Limited</td><td class="cross">No</td></tr>
+        <tr><td>AI Answer Evaluation</td><td class="check">Yes</td><td class="cross">No</td><td class="cross">No</td><td class="cross">No</td></tr>
+        <tr><td>Live Quiz Mode</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td><td class="cross">No</td></tr>
+        <tr><td>Gamification (XP/Badges)</td><td class="check">Yes</td><td class="cross">Limited</td><td class="check">Yes</td><td class="cross">No</td></tr>
+        <tr><td>PDF Material Upload</td><td class="check">Yes</td><td class="cross">No</td><td class="cross">No</td><td class="cross">No</td></tr>
+        <tr><td>AI Tutor Chat</td><td class="check">Yes</td><td class="cross">No</td><td class="cross">No</td><td class="cross">No</td></tr>
+        <tr><td>6 Question Types</td><td class="check">Yes</td><td class="cross">4</td><td class="cross">5</td><td class="cross">4</td></tr>
+        <tr><td>Per-question Analytics</td><td class="check">Yes</td><td class="cross">Limited</td><td class="check">Yes</td><td class="cross">Limited</td></tr>
+        <tr><td>Self-hosted & Free</td><td class="check">Yes</td><td class="cross">No</td><td class="cross">No</td><td class="check">Yes</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Slide 9: Impact -->
+  <div class="slide">
+    <h2>Expected <span>Impact</span></h2>
+    <div class="grid-4" style="margin-bottom:40px">
+      <div class="stat-card"><div class="stat-num">70%</div><div class="stat-desc">Reduction in quiz creation time with AI</div></div>
+      <div class="stat-card"><div class="stat-num">34%</div><div class="stat-desc">Increase in student engagement</div></div>
+      <div class="stat-card"><div class="stat-num">50%</div><div class="stat-desc">Higher completion rates with gamification</div></div>
+      <div class="stat-card"><div class="stat-num">20%</div><div class="stat-desc">Improvement in learning outcomes</div></div>
+    </div>
+    <h3>Key Benefits</h3>
+    <div class="grid-2">
+      <ul style="font-size:15px">
+        <li><span class="highlight">Teachers</span> save hours with AI quiz generation</li>
+        <li><span class="highlight">Students</span> stay motivated with XP and badges</li>
+        <li><span class="highlight">Analytics</span> identify struggles before they escalate</li>
+      </ul>
+      <ul style="font-size:15px">
+        <li><span class="highlight">Live mode</span> creates classroom energy</li>
+        <li><span class="highlight">AI tutor</span> provides 24/7 student support</li>
+        <li><span class="highlight">Self-hosted</span> means full data control</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Slide 10: Roadmap -->
+  <div class="slide">
+    <h2>Future <span>Roadmap</span></h2>
+    <div class="grid-2" style="gap:32px">
+      <div>
+        <h3>Near Term</h3>
+        <div class="feature-card" style="margin-bottom:12px"><h4>Adaptive Difficulty</h4><p>AI adjusts question difficulty in real-time based on student performance</p></div>
+        <div class="feature-card" style="margin-bottom:12px"><h4>Group Quiz Mode</h4><p>Team-based competitions with collaborative scoring</p></div>
+        <div class="feature-card"><h4>Question Bank Sharing</h4><p>Teachers share and import questions across the platform</p></div>
+      </div>
+      <div>
+        <h3>Long Term</h3>
+        <div class="feature-card" style="margin-bottom:12px"><h4>LMS Integrations</h4><p>Google Classroom, Canvas, and Moodle integration</p></div>
+        <div class="feature-card" style="margin-bottom:12px"><h4>Multi-language Support</h4><p>Quizzes and AI tutor in multiple languages</p></div>
+        <div class="feature-card"><h4>Parent Dashboard</h4><p>Guardian access to student progress and reports</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 11: Thank You -->
+  <div class="slide slide-end">
+    <h2>Thank <span>You</span></h2>
+    <p style="font-size:20px;color:#94a3b8;margin-bottom:8px">Smart Quiz Agent - AI-Powered Quiz Management Platform</p>
+    <p style="font-size:16px;color:#6366f1;font-weight:500">Aryan Kale</p>
+    <p style="font-size:14px;color:#475569;margin-top:24px">Demo: http://localhost:3456</p>
+    <p style="font-size:13px;color:#334155;margin-top:4px">teacher@springfield.edu / student@springfield.edu / admin@springfield.edu (password: password)</p>
+  </div>
+</div>
+
+<div class="slide-number" id="slide-number">1 / 11</div>
+
+<script>
+let current = 0;
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+
+function showSlide(n) {
+  if (n < 0 || n >= total) return;
+  slides[current].classList.remove('active');
+  current = n;
+  slides[current].classList.add('active');
+  document.getElementById('slide-number').textContent = (current + 1) + ' / ' + total;
+  document.getElementById('progress').style.width = ((current + 1) / total * 100) + '%';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') { e.preventDefault(); showSlide(current + 1); }
+  if (e.key === 'ArrowLeft' || e.key === 'Backspace') { e.preventDefault(); showSlide(current - 1); }
+  if (e.key === 'Home') showSlide(0);
+  if (e.key === 'End') showSlide(total - 1);
+});
+
+document.addEventListener('click', e => {
+  if (e.clientX > window.innerWidth / 2) showSlide(current + 1);
+  else showSlide(current - 1);
+});
+
+showSlide(0);
+</script>
+</body>
+</html>

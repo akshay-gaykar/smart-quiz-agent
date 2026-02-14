@@ -1,0 +1,11 @@
+[project]
+name = "smart-quiz-agent"
+version = "0.1.0"
+description = "AI-powered Smart Quiz Management System built with Anthropic Agent SDK"
+requires-python = ">=3.11"
+dependencies = [
+    "claude-agent-sdk>=0.1.0",
+]
+
+[project.scripts]
+quiz = "agent.main:main"

@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: quiz_db
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5433:5432"
+
+  app:
+    build: ./agent
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-admin}@postgres:5432/quiz_db
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      CLAUDE_CODE_PATH: /usr/local/bin/claude
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      PORT: "3456"
+    volumes:
+      - ${CLAUDE_CODE_PATH:-/usr/local/bin/claude}:/usr/local/bin/claude:ro
+      - ../data:/app/data:ro
+      - quiz_uploads:/app/uploads
+    ports:
+      - "3456:3456"
+
+volumes:
+  postgres_data:
+  quiz_uploads:

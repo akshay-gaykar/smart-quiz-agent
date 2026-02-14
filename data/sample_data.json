@@ -1,0 +1,132 @@
+{
+  "organizations": [
+    {
+      "id": "org-demo-school",
+      "name": "Springfield Academy",
+      "type": "school",
+      "address": "123 Education Lane, Springfield"
+    }
+  ],
+  "users": [
+    {
+      "id": "user-admin-01",
+      "email": "admin@springfield.edu",
+      "password_hash": "$2b$10$puGbGcJbQlrP9PSJzHRVS.Y/urg4/HyBmlF9Vl64B8poyS.Iwe.lK",
+      "name": "Admin User",
+      "role": "admin",
+      "organization_id": "org-demo-school"
+    },
+    {
+      "id": "user-teacher-01",
+      "email": "teacher@springfield.edu",
+      "password_hash": "$2b$10$puGbGcJbQlrP9PSJzHRVS.Y/urg4/HyBmlF9Vl64B8poyS.Iwe.lK",
+      "name": "Ms. Johnson",
+      "role": "teacher",
+      "organization_id": "org-demo-school"
+    },
+    {
+      "id": "user-student-01",
+      "email": "student@springfield.edu",
+      "password_hash": "$2b$10$puGbGcJbQlrP9PSJzHRVS.Y/urg4/HyBmlF9Vl64B8poyS.Iwe.lK",
+      "name": "Alex Student",
+      "role": "student",
+      "organization_id": "org-demo-school"
+    }
+  ],
+  "topics": [
+    {
+      "id": "topic-physics-01",
+      "title": "Newton's Laws of Motion",
+      "description": "Covers all three laws of motion, force, mass, acceleration, and real-world applications.",
+      "subject": "Physics",
+      "grade_level": "Grade 10",
+      "teacher_id": "user-teacher-01",
+      "organization_id": "org-demo-school"
+    },
+    {
+      "id": "topic-math-01",
+      "title": "Quadratic Equations",
+      "description": "Solving quadratic equations using factoring, completing the square, and the quadratic formula.",
+      "subject": "Mathematics",
+      "grade_level": "Grade 10",
+      "teacher_id": "user-teacher-01",
+      "organization_id": "org-demo-school"
+    }
+  ],
+  "quizzes": [
+    {
+      "id": "quiz-physics-01",
+      "title": "Newton's Laws - Practice Quiz",
+      "topic_id": "topic-physics-01",
+      "teacher_id": "user-teacher-01",
+      "quiz_type": "practice",
+      "status": "published",
+      "time_limit_minutes": 30,
+      "total_marks": 10,
+      "pass_percentage": 40,
+      "questions": [
+        {
+          "id": "q-phys-01",
+          "question_text": "Which of Newton's laws states that an object at rest stays at rest unless acted upon by an external force?",
+          "question_type": "mcq",
+          "options": ["First Law", "Second Law", "Third Law", "Law of Gravitation"],
+          "correct_answer": "First Law",
+          "marks": 1,
+          "explanation": "Newton's First Law (Law of Inertia) states that an object at rest stays at rest, and an object in motion stays in motion with the same speed and direction, unless acted upon by an unbalanced force.",
+          "difficulty": "easy",
+          "order_index": 1
+        },
+        {
+          "id": "q-phys-02",
+          "question_text": "F = ma is the mathematical expression of Newton's Second Law.",
+          "question_type": "true_false",
+          "options": ["True", "False"],
+          "correct_answer": "True",
+          "marks": 1,
+          "explanation": "Newton's Second Law states that the acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass. This is expressed as F = ma.",
+          "difficulty": "easy",
+          "order_index": 2
+        },
+        {
+          "id": "q-phys-03",
+          "question_text": "A 5 kg object is accelerating at 3 m/s². What is the net force acting on it?",
+          "question_type": "mcq",
+          "options": ["8 N", "15 N", "1.67 N", "2 N"],
+          "correct_answer": "15 N",
+          "marks": 2,
+          "explanation": "Using F = ma: F = 5 kg × 3 m/s² = 15 N",
+          "difficulty": "medium",
+          "order_index": 3
+        },
+        {
+          "id": "q-phys-04",
+          "question_text": "Explain Newton's Third Law with a real-world example.",
+          "question_type": "short_answer",
+          "options": null,
+          "correct_answer": "Newton's Third Law states that for every action, there is an equal and opposite reaction. For example, when you push against a wall, the wall pushes back on you with equal force in the opposite direction.",
+          "marks": 3,
+          "explanation": "Newton's Third Law explains that forces always come in pairs. The action and reaction forces act on different objects and are equal in magnitude but opposite in direction.",
+          "difficulty": "medium",
+          "order_index": 4
+        },
+        {
+          "id": "q-phys-05",
+          "question_text": "A rocket propels itself forward by expelling gas backward. Which of Newton's laws best explains this?",
+          "question_type": "mcq",
+          "options": ["First Law", "Second Law", "Third Law", "All of the above"],
+          "correct_answer": "Third Law",
+          "marks": 3,
+          "explanation": "The rocket expels gas backward (action), and the gas pushes the rocket forward (reaction). This is a direct application of Newton's Third Law.",
+          "difficulty": "hard",
+          "order_index": 5
+        }
+      ]
+    }
+  ],
+  "enrollments": [
+    {
+      "student_id": "user-student-01",
+      "organization_id": "org-demo-school"
+    }
+  ]
+}
